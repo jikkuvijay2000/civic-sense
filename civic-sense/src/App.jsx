@@ -36,7 +36,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
 
           {/* Dashboard Routes with Layout */}
           <Route path="/dashboard" element={<DashboardLayout />}>
