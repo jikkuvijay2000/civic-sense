@@ -88,7 +88,7 @@ const Register = () => {
             if (response.status === 200) {
                 notify("success", "Registration successful! Redirecting to login...");
                 setTimeout(() => {
-                    navigate('/login');
+                    navigate('/');
                 }, 2000);
             } else {
                 notify("error", response.data.message);

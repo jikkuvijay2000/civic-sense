@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import civicCleaning from '../assets/realistic_cleaning.png';
 import civicRecycling from '../assets/realistic_recycling.png';
@@ -232,7 +232,7 @@ const Login = () => {
 
                             <div className="text-center">
                                 <p className="text-muted mb-0">
-                                    Don't have an account? <a href="/register" className="text-primary fw-bold text-decoration-none">Sign Up</a>
+                                    Don't have an account? <Link to="/register" className="text-primary fw-bold text-decoration-none">Sign Up</Link>
                                 </p>
                             </div>
                         </form>
