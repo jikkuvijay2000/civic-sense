@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import AuthoritySidebar from '../Components/AuthoritySidebar';
+import AuthoritySidebar from '../components/AuthoritySidebar';
 import { io } from 'socket.io-client';
 import { toast } from 'react-toastify';
 import { FaExclamationTriangle, FaTimes } from 'react-icons/fa';
+import { BASE_URL } from '../services/baseUrl';
 
 const AuthorityLayout = () => {
     const [emergencyModal, setEmergencyModal] = useState(false);
     const [emergencyData, setEmergencyData] = useState(null);
 
     useEffect(() => {
-        const socket = io("http://localhost:3000");
+        const socket = io(BASE_URL);
 
         socket.on("new_emergency_complaint", (data) => {
             console.log("Emergency Complaint Received:", data);

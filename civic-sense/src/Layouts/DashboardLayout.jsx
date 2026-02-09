@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import Sidebar from '../Components/Sidebar';
+import Sidebar from '../components/Sidebar';
 import { io } from 'socket.io-client';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaExclamationTriangle, FaTimes } from 'react-icons/fa';
+import { BASE_URL } from '../services/baseUrl';
 
 const DashboardLayout = () => {
     const [alertModal, setAlertModal] = useState(false);
@@ -12,7 +13,7 @@ const DashboardLayout = () => {
 
     useEffect(() => {
         // Connect to the backend Socket.io server
-        const socket = io("http://localhost:3000"); // Ensure this matches your backend URL
+        const socket = io(BASE_URL); // Ensure this matches your backend URL
 
         socket.on("connect", () => {
             console.log("Connected to Socket.io server");

@@ -6,6 +6,7 @@ import civicLogo from '../assets/civic_sense_symbolic_logo.png';
 import { notify } from '../utils/notify';
 import { io } from 'socket.io-client';
 import { toast } from 'react-toastify';
+import { BASE_URL } from '../services/baseUrl';
 
 const AuthoritySidebar = () => {
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ const AuthoritySidebar = () => {
         }
 
         // Socket.io for Emergency Alerts
-        const socket = io("http://localhost:3000");
+        const socket = io(BASE_URL);
 
         socket.on("new_emergency_complaint", (data) => {
             console.log("Emergency Alert:", data);

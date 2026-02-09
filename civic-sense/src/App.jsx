@@ -16,7 +16,7 @@ import ComplaintManagement from './Pages/ComplaintManagement'
 import Leaderboard from './Pages/Leaderboard'
 import CommunityPost from './Pages/CommunityPost'
 import Unauthorized from './Pages/Unauthorized'
-import RequireAuthority from './Components/RequireAuthority'
+import RequireAuthority from './components/RequireAuthority'
 
 function App() {
 

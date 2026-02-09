@@ -129,7 +129,8 @@ const predictComplaint = async (req, res) => {
         }
 
         // Call Python AI Microservice
-        const response = await axios.post('http://localhost:5001/predict', { text });
+        const aiUrl = process.env.TEXT_AI_URL || 'http://localhost:5001';
+        const response = await axios.post(`${aiUrl}/predict`, { text });
 
         res.json(response.data);
     } catch (error) {
@@ -149,7 +150,8 @@ const generateCaption = async (req, res) => {
         formData.append('image', fs.createReadStream(req.file.path));
 
         // Call Python Image Captioning Service
-        const response = await axios.post('http://localhost:5002/caption', formData, {
+        const captionUrl = process.env.IMAGE_AI_URL || 'http://localhost:5002';
+        const response = await axios.post(`${captionUrl}/caption`, formData, {
             headers: {
                 ...formData.getHeaders()
             }
