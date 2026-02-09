@@ -3,8 +3,8 @@ const crypto = require("crypto");
 const generateCSRFToken = (req, res) => {
     const token = crypto.randomBytes(32).toString("hex");
     res.cookie("csrfToken", token, {
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        secure: true, // Always true for SameSite: None 
+        sameSite: "none",
     })
 
     return res.json({ csrfToken: token })
