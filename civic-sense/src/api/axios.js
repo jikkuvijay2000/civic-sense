@@ -18,7 +18,7 @@ api.interceptors.response.use(
                 await api.post("/user/refresh");
                 return api(originalRequest);
             } catch {
-                window.location.href = "/login";
+                window.location.href = "/";
             }
         }
 

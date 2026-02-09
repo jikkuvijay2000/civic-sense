@@ -80,7 +80,7 @@ const AuthoritySidebar = () => {
                     .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
             });
             notify("success", "Logged out successfully");
-            navigate('/login');
+            navigate('/');
         } catch (error) {
             console.error("Logout error", error);
             notify("error", "Failed to logout");
