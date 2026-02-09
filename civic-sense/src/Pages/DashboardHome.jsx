@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaSearch, FaBell, FaUserCircle, FaHeart, FaComment, FaShare, FaHandsHelping, FaImage } from 'react-icons/fa';
-import Calendar from '../Components/Calendar';
+import Calendar from '../components/Calendar';
 import { notify } from '../utils/notify';
 
 import api from '../api/axios';
