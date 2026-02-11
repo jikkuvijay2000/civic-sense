@@ -32,7 +32,15 @@ const Login = () => {
     }, [carouselImages.length]);
 
     useEffect(() => {
-        api.get('/user/csrf-token');
+        const fetchCsrfToken = async () => {
+            try {
+                const { data } = await api.get('/user/csrf-token');
+                api.defaults.headers.common['x-csrf-token'] = data.csrfToken;
+            } catch (error) {
+                console.error("Failed to fetch CSRF token", error);
+            }
+        };
+        fetchCsrfToken();
     }, []);
 
     // Animation variants
@@ -52,12 +60,6 @@ const Login = () => {
         loginDetails.userPassword &&
         emailRegex.test(loginDetails.userEmail);
 
-    const getCsrfToken = () => {
-        return document.cookie
-            .split('; ')
-            .find(row => row.startsWith('csrfToken='))
-            ?.split('=')[1];
-    }
     const handleLogin = async (e) => {
         e.preventDefault();
 
@@ -77,10 +79,6 @@ const Login = () => {
             const response = await api.post('user/login', {
                 userEmail: loginDetails.userEmail,
                 userPassword: loginDetails.userPassword
-            }, {
-                headers: {
-                    'x-csrf-token': getCsrfToken()
-                }
             });
 
             if (response.status === 200) {
