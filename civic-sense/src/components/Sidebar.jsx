@@ -24,7 +24,7 @@ const Sidebar = () => {
             console.log("Sidebar Debug - State User set:", storedUser); // Debug log
         } else {
             console.log("Sidebar Debug - No user found, redirecting"); // Debug log
-            navigate('/login');
+            navigate('/');
         }
     }, [navigate]);
 
@@ -57,7 +57,7 @@ const Sidebar = () => {
             });
 
             notify("success", "Logged out successfully");
-            navigate('/login');
+            navigate('/');
         } catch (error) {
             console.error("Logout error", error);
             notify("error", "Failed to logout");

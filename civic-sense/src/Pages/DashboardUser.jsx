@@ -15,7 +15,7 @@ const DashboardUser = () => {
         if (storedUser) {
             setUser(JSON.parse(storedUser));
         } else {
-            navigate('/login'); // Redirect if no user found
+            navigate('/'); // Redirect if no user found
         }
     }, [navigate]);
 
