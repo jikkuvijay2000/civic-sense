@@ -5,7 +5,6 @@ import { Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, B
 import api from '../api/axios';
 import { notify } from '../utils/notify';
 import { initiateSocketConnection, subscribeToEmergency, subscribeToAuthorityNotifications } from '../utils/socketService';
-import EmergencyAlertModal from '../components/EmergencyAlertModal';
 import AIAnimation from '../Components/AIAnimation';
 
 const AuthorityDashboard = () => {
@@ -15,8 +14,6 @@ const AuthorityDashboard = () => {
         pending: 0
     });
     const [loading, setLoading] = useState(true);
-    const [alertModalOpen, setAlertModalOpen] = useState(false);
-    const [currentAlert, setCurrentAlert] = useState(null);
 
     // Notifications State
     const [notifications, setNotifications] = useState([]);
@@ -86,15 +83,7 @@ const AuthorityDashboard = () => {
                 setNotifications(prev => [newNotif, ...prev]);
                 setUnreadCount(prev => prev + 1);
 
-                // Trigger the Emergency Modal
-                setCurrentAlert({
-                    title: "Emergency Issue Registered! \n" + data.complaint.complaintType,
-                    content: `Location: ${data.complaint.complaintLocation}\nDetails: ${data.complaint.complaintDescription}`,
-                    image: data.complaint.complaintImage,
-                    author: data.complaint.complaintAuthority,
-                    createdAt: new Date().toISOString()
-                });
-                setAlertModalOpen(true);
+                // Layout handles the Emergency modal globally
             }
         });
 
@@ -150,11 +139,6 @@ const AuthorityDashboard = () => {
             </div>
 
             <div className="p-5">
-                <EmergencyAlertModal
-                    isOpen={alertModalOpen}
-                    onClose={() => setAlertModalOpen(false)}
-                    alertData={currentAlert}
-                />
 
                 <div className="row g-4">
                     {stats.map((stat, index) => (

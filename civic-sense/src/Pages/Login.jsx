@@ -91,8 +91,12 @@ const Login = () => {
             });
 
             if (response.status === 200) {
-                const { user } = response.data;
+                const { user, accessToken } = response.data;
                 localStorage.setItem('user', JSON.stringify(user));
+                if (accessToken) {
+                    localStorage.setItem('accessToken', accessToken);
+                }
+
                 notify("success", "Login successful!");
                 setTimeout(() => {
                     if (user.role === 'Authority') {

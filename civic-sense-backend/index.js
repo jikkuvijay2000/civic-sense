@@ -27,15 +27,20 @@ const io = new Server(server, {
 
 // Middleware for Socket Authentication
 io.use((socket, next) => {
-    // Parse cookies from handshake headers
-    const cookieHeader = socket.handshake.headers.cookie;
-    if (!cookieHeader) return next(new Error("Authentication error: No cookies"));
+    let token = null;
 
-    // Extract accessToken
-    const cookies = Object.fromEntries(cookieHeader.split('; ').map(c => c.split('=')));
-    const token = cookies.accessToken;
+    // 1. Try to get token from handshake auth payload (explicit)
+    if (socket.handshake.auth && socket.handshake.auth.token) {
+        token = socket.handshake.auth.token;
+    }
 
-    if (!token) return next(new Error("Authentication error: No token"));
+    // 2. Try to get token from cookies (fallback)
+    if (!token && socket.handshake.headers.cookie) {
+        const cookies = Object.fromEntries(socket.handshake.headers.cookie.split('; ').map(c => c.split('=')));
+        token = cookies.accessToken;
+    }
+
+    if (!token) return next(new Error("Authentication error: No token found in auth payload or cookies"));
 
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);

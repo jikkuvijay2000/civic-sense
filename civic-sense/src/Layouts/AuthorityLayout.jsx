@@ -38,35 +38,46 @@ const AuthorityLayout = () => {
 
             {/* Persistent Emergency Modal */}
             {emergencyModal && emergencyData && (
-                <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 9999, backgroundColor: 'rgba(220, 53, 69, 0.9)', backdropFilter: 'blur(5px)' }}>
-                    <div className="bg-white rounded-custom-xl shadow-custom-lg overflow-hidden position-relative animate__animated animate__pulse animate__infinite" style={{ maxWidth: '600px', width: '90%', border: '4px solid #dc3545' }}>
-                        <div className="bg-danger text-white p-4 d-flex align-items-center justify-content-between">
-                            <h2 className="mb-0 fw-bold d-flex align-items-center gap-3">
-                                <FaExclamationTriangle className="fs-1 warning-blink" /> EMERGENCY REPORT
-                            </h2>
+                <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 9999, backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)' }}>
+                    <div className="bg-white rounded-4 overflow-hidden position-relative animate__animated animate__zoomIn" style={{ maxWidth: '500px', width: '90%', boxShadow: '0 20px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)', borderLeft: '6px solid #ef4444' }}>
+
+                        <div className="px-4 pt-4 pb-0 d-flex align-items-center justify-content-between">
+                            <span className="badge bg-danger-subtle text-danger rounded-pill px-3 py-2 d-flex align-items-center gap-2 border border-danger-subtle fw-bold" style={{ letterSpacing: '0.5px' }}>
+                                <FaExclamationTriangle /> EMERGENCY ALERT
+                            </span>
+                            <button onClick={() => setEmergencyModal(false)} className="btn btn-sm btn-light rounded-circle p-2 d-flex align-items-center justify-content-center text-secondary hover-scale transition-fast" style={{ width: '32px', height: '32px' }}>
+                                <FaTimes />
+                            </button>
                         </div>
-                        <div className="p-5 text-center">
+
+                        <div className="p-4 px-md-5 text-center">
                             {emergencyData.complaint.complaintImage && (
-                                <img src={emergencyData.complaint.complaintImage} alt="Emergency" className="img-fluid rounded-4 mb-4 shadow-sm border border-danger" style={{ maxHeight: '250px', objectFit: 'cover' }} />
+                                <div className="mb-4 mx-auto border rounded-4 p-1 shadow-sm" style={{ maxWidth: '350px', backgroundColor: '#f8fafc' }}>
+                                    <img src={emergencyData.complaint.complaintImage} alt="Emergency" className="img-fluid rounded-3 w-100" style={{ height: '200px', objectFit: 'cover' }} />
+                                </div>
                             )}
-                            <h3 className="fw-bold text-danger mb-2 text-uppercase">{emergencyData.complaint.complaintType}</h3>
-                            <h5 className="fw-bold text-dark mb-4">{emergencyData.complaint.complaintLocation}</h5>
 
-                            <div className="bg-light p-3 rounded-3 mb-4 text-start border-start border-4 border-danger">
-                                <p className="mb-0 fs-5" style={{ whiteSpace: 'pre-line' }}>{emergencyData.complaint.complaintDescription.replace(/\*\*/g, '')}</p>
+                            <h4 className="fw-bolder text-dark mb-2">{emergencyData.complaint.complaintType}</h4>
+                            <p className="text-muted small fw-medium mb-4 d-flex align-items-center justify-content-center gap-1">
+                                <i className="bi bi-geo-alt-fill text-danger"></i> {emergencyData.complaint.complaintLocation}
+                            </p>
+
+                            <div className="bg-light p-3 rounded-4 mb-4 text-start border shadow-sm">
+                                <p className="mb-0 text-secondary" style={{ whiteSpace: 'pre-line', lineHeight: '1.6', fontSize: '0.95rem' }}>{emergencyData.complaint.complaintDescription.replace(/\*\*/g, '')}</p>
                             </div>
 
-                            <div className="d-flex justify-content-center gap-3">
-                                <button
-                                    onClick={() => setEmergencyModal(false)}
-                                    className="btn btn-danger btn-lg px-5 py-3 rounded-pill fw-bold shadow-lg hover-scale"
-                                >
-                                    ACKNOWLEDGE & CLOSE
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => setEmergencyModal(false)}
+                                className="btn btn-danger w-100 py-3 rounded-pill fw-bold hover-scale shadow-sm"
+                            >
+                                Acknowledge & Secure
+                            </button>
                         </div>
-                        <div className="bg-dark text-white p-3 text-center">
-                            <small className="fw-bold text-uppercase ls-wide">REPORTED BY USER • {new Date(emergencyData.complaint.createdAt).toLocaleTimeString()}</small>
+
+                        <div className="bg-light p-3 text-center border-top">
+                            <small className="text-secondary fw-semibold text-uppercase" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>
+                                Reported by Citizen • {new Date(emergencyData.complaint.createdAt).toLocaleTimeString()}
+                            </small>
                         </div>
                     </div>
                 </div>

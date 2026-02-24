@@ -47,32 +47,42 @@ const DashboardLayout = () => {
 
             {/* Alert Modal Overlay */}
             {alertModal && alertData && (
-                <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 1050, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)' }}>
-                    <div className="bg-white rounded-custom-xl shadow-custom-lg overflow-hidden position-relative" style={{ maxWidth: '500px', width: '90%', animation: 'slideInDown 0.4s ease-out' }}>
-                        <div className="bg-danger text-white p-4 d-flex align-items-center justify-content-between">
-                            <h4 className="mb-0 fw-bold d-flex align-items-center gap-2">
-                                <FaExclamationTriangle className="fs-3" /> EMERGENCY ALERT
-                            </h4>
-                            <button onClick={() => setAlertModal(false)} className="btn btn-link text-white p-0 fs-4 hover-rotate transition-fast">
+                <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 1050, backgroundColor: 'rgba(15, 23, 42, 0.7)', backdropFilter: 'blur(8px)' }}>
+                    <div className="bg-white rounded-4 overflow-hidden position-relative animate__animated animate__zoomIn" style={{ maxWidth: '500px', width: '90%', boxShadow: '0 20px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)', borderLeft: '6px solid #ef4444' }}>
+
+                        <div className="px-4 pt-4 pb-0 d-flex align-items-center justify-content-between">
+                            <span className="badge bg-danger-subtle text-danger rounded-pill px-3 py-2 d-flex align-items-center gap-2 border border-danger-subtle fw-bold" style={{ letterSpacing: '0.5px' }}>
+                                <FaExclamationTriangle /> EMERGENCY ALERT
+                            </span>
+                            <button onClick={() => setAlertModal(false)} className="btn btn-sm btn-light rounded-circle p-2 d-flex align-items-center justify-content-center text-secondary hover-scale transition-fast" style={{ width: '32px', height: '32px' }}>
                                 <FaTimes />
                             </button>
                         </div>
-                        <div className="p-5 text-center">
+
+                        <div className="p-4 px-md-5 text-center">
                             {alertData.image && (
-                                <img src={alertData.image} alt="Alert" className="img-fluid rounded-4 mb-4 shadow-sm" style={{ maxHeight: '200px', objectFit: 'cover' }} />
+                                <div className="mb-4 mx-auto border rounded-4 p-1 shadow-sm" style={{ maxWidth: '350px', backgroundColor: '#f8fafc' }}>
+                                    <img src={alertData.image} alt="Alert" className="img-fluid rounded-3 w-100" style={{ height: '200px', objectFit: 'cover' }} />
+                                </div>
                             )}
-                            <h3 className="fw-bold text-dark mb-3">{alertData.title}</h3>
-                            <p className="text-secondary mb-4 fs-5" style={{ lineHeight: '1.6' }}>
-                                {alertData.content}
-                            </p>
-                            <div className="d-flex justify-content-center gap-3">
-                                <button onClick={() => setAlertModal(false)} className="btn btn-danger px-5 py-2 rounded-pill fw-bold shadow-sm hover-scale transition-fast">
-                                    Acknowledge
-                                </button>
+                            <h4 className="fw-bolder text-dark mb-4">{alertData.title}</h4>
+
+                            <div className="bg-light p-3 rounded-4 mb-4 text-start border shadow-sm">
+                                <p className="mb-0 text-secondary" style={{ whiteSpace: 'pre-line', lineHeight: '1.6', fontSize: '0.95rem' }}>{alertData.content}</p>
                             </div>
+
+                            <button
+                                onClick={() => setAlertModal(false)}
+                                className="btn btn-danger w-100 py-3 rounded-pill fw-bold hover-scale shadow-sm"
+                            >
+                                Acknowledge Alert
+                            </button>
                         </div>
+
                         <div className="bg-light p-3 text-center border-top">
-                            <small className="text-muted fw-bold text-uppercase ls-wide">Issued by {alertData.role} • {new Date(alertData.createdAt).toLocaleTimeString()}</small>
+                            <small className="text-secondary fw-semibold text-uppercase" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>
+                                ISSUED BY {alertData.role?.toUpperCase() || 'AUTHORITY'} • {new Date(alertData.createdAt).toLocaleTimeString()}
+                            </small>
                         </div>
                     </div>
                 </div>

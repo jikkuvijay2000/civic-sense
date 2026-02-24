@@ -6,10 +6,16 @@ let socket;
 
 export const initiateSocketConnection = () => {
     if (!socket) {
+        // Extract token from localStorage to guarantee it gets sent
+        const token = localStorage.getItem('accessToken');
+
         socket = io(SOCKET_URL, {
             withCredentials: true,
             reconnection: true,
             reconnectionAttempts: 5,
+            auth: {
+                token: token
+            }
         });
 
         socket.on("connect_error", (err) => {

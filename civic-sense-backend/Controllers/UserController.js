@@ -94,6 +94,7 @@ const loginUser = async (req, res) => {
 
         res.json({
             message: "Login successful",
+            accessToken: accessToken, // <-- Send token in response for WebSockets
             user: {
                 _id: user._id,
                 userName: user.userName,
@@ -128,7 +129,7 @@ const refreshToken = async (req, res) => {
 
     setAuthCookies(res, newAccessToken, newRefreshToken);
 
-    res.json({ message: "Token refreshed" });
+    res.json({ message: "Token refreshed", accessToken: newAccessToken });
 };
 
 const logoutUser = async (req, res) => {

@@ -148,9 +148,16 @@ const ComplaintDetailsModal = ({ isOpen, onClose, complaint, onUpdate }) => {
                                                 <FaCheckCircle />
                                                 <span className="fw-bold">Marked Resolved</span>
                                             </div>
-                                            <p className="small text-muted mb-0">
+                                            <p className="small text-muted mb-2">
                                                 By Authority on {new Date(complaint.complaintResolvedDate || complaint.updatedAt).toLocaleDateString()}
                                             </p>
+
+                                            {complaint.complaintNotes && (
+                                                <div className="bg-light p-3 rounded border border-light shadow-sm">
+                                                    <small className="text-uppercase fw-bold text-muted d-block mb-1" style={{ fontSize: '10px', letterSpacing: '0.5px' }}>OFFICIAL AUTHORITY NOTES</small>
+                                                    <p className="mb-0 text-dark" style={{ fontSize: '0.9rem' }}>{complaint.complaintNotes}</p>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Download Expense Report */}

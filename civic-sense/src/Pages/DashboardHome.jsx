@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FaSearch, FaBell, FaUserCircle, FaHeart, FaComment, FaShare, FaHandsHelping, FaImage, FaExclamationCircle, FaCheckCircle } from 'react-icons/fa';
 import Calendar from '../Components/Calendar';
 import NotificationDropdown from '../components/NotificationDropdown';
-import EmergencyAlertModal from '../components/EmergencyAlertModal';
+import ComplaintDetailsModal from '../components/ComplaintDetailsModal';
 import { notify } from '../utils/notify';
 import { initiateSocketConnection, subscribeToNotifications, subscribeToAlerts, disconnectSocket } from '../utils/socketService';
 import AIAnimation from '../Components/AIAnimation';
@@ -26,11 +26,29 @@ const DashboardHome = () => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await api.get('/community-post');
-                setFeedPosts(response.data);
+                const [postsRes, complaintsRes] = await Promise.all([
+                    api.get('/community-post'),
+                    api.get('/complaint/resolved')
+                ]);
+
+                const formattedComplaints = complaintsRes.data.data.map(c => ({
+                    _id: c._id,
+                    isComplaint: true,
+                    rawComplaint: c,
+                    author: c.complaintUser?.userName || 'Citizen',
+                    role: 'Resolved Ticket',
+                    tag: 'Resolved',
+                    title: `Resolved: ${c.complaintType}`,
+                    content: c.complaintDescription,
+                    image: c.complaintImage,
+                    createdAt: c.complaintResolvedDate || c.updatedAt || c.createdAt
+                }));
+
+                const allPosts = [...postsRes.data, ...formattedComplaints].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                setFeedPosts(allPosts);
             } catch (error) {
                 console.error("Error fetching posts:", error);
-                // notify("error", "Could not load feed");
             } finally {
                 setLoadingPosts(false);
             }
@@ -76,9 +94,7 @@ const DashboardHome = () => {
             if (data) {
                 setFeedPosts(prev => [data, ...prev]);
 
-                // Trigger Red Popup
-                setCurrentAlert(data);
-                setAlertModalOpen(true);
+                // Layout component handles the Red Popup globally.
 
                 // Also add to notifications
                 const newNotification = {
@@ -138,16 +154,15 @@ const DashboardHome = () => {
         }
     }, []);
 
-    const [alertModalOpen, setAlertModalOpen] = useState(false);
-    const [currentAlert, setCurrentAlert] = useState(null);
-
+    const [selectedComplaint, setSelectedComplaint] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
         <div className="row m-0 bg-body min-vh-100">
-            <EmergencyAlertModal
-                isOpen={alertModalOpen}
-                onClose={() => setAlertModalOpen(false)}
-                alertData={currentAlert}
+            <ComplaintDetailsModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                complaint={selectedComplaint}
             />
             {/* ... rest of the dashboard ... */}
             {/* Center Feed */}
@@ -241,7 +256,13 @@ const DashboardHome = () => {
                                     initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="bg-surface rounded-custom-xl shadow-custom-md overflow-hidden border border-light"
+                                    className={`bg-surface rounded-custom-xl shadow-custom-md overflow-hidden border border-light ${post.isComplaint ? 'cursor-pointer hover-scale' : ''}`}
+                                    onClick={() => {
+                                        if (post.isComplaint) {
+                                            setSelectedComplaint(post.rawComplaint);
+                                            setIsModalOpen(true);
+                                        }
+                                    }}
                                 >
                                     <div className="p-4 d-flex align-items-center justify-content-between">
                                         <div className="d-flex align-items-center gap-3">
