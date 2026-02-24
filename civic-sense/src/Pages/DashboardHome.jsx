@@ -64,7 +64,7 @@ const DashboardHome = () => {
         // Initialize Socket
         initiateSocketConnection();
 
-        subscribeToNotifications((err, data) => {
+        const unsubNotifs = subscribeToNotifications((err, data) => {
             if (data) {
                 setNotifications(prev => [data, ...prev]);
                 setUnreadCount(prev => prev + 1);
@@ -72,15 +72,31 @@ const DashboardHome = () => {
             }
         });
 
-        subscribeToAlerts((err, data) => {
+        const unsubAlerts = subscribeToAlerts((err, data) => {
             if (data) {
                 setFeedPosts(prev => [data, ...prev]);
+
+                // Trigger Red Popup
+                setCurrentAlert(data);
+                setAlertModalOpen(true);
+
+                // Also add to notifications
+                const newNotification = {
+                    _id: Date.now(), // Temporary ID
+                    message: `ALERT: ${data.title}`,
+                    type: 'warning',
+                    createdAt: new Date().toISOString(),
+                    isRead: false
+                };
+                setNotifications(prev => [newNotification, ...prev]);
+                setUnreadCount(prev => prev + 1);
                 notify("warning", `New Alert: ${data.title}`);
             }
         });
 
         return () => {
-            disconnectSocket();
+            if (unsubNotifs) unsubNotifs();
+            if (unsubAlerts) unsubAlerts();
         };
     }, []);
 
@@ -125,34 +141,6 @@ const DashboardHome = () => {
     const [alertModalOpen, setAlertModalOpen] = useState(false);
     const [currentAlert, setCurrentAlert] = useState(null);
 
-    // Fetch posts on mount
-    useEffect(() => {
-        // ... previous fetch logic ...
-
-        // ... socket logic ...
-        subscribeToAlerts((err, data) => {
-            if (data) {
-                setFeedPosts(prev => [data, ...prev]);
-
-                // Trigger Red Popup
-                setCurrentAlert(data);
-                setAlertModalOpen(true);
-
-                // Also add to notifications
-                const newNotification = {
-                    _id: Date.now(), // Temporary ID
-                    message: `ALERT: ${data.title}`,
-                    type: 'warning',
-                    createdAt: new Date().toISOString(),
-                    isRead: false
-                };
-                setNotifications(prev => [newNotification, ...prev]);
-                setUnreadCount(prev => prev + 1);
-            }
-        });
-
-        // ... cleanup ...
-    }, []);
 
     return (
         <div className="row m-0 bg-body min-vh-100">

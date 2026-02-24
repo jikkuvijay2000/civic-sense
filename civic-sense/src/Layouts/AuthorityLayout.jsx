@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import AuthoritySidebar from '../components/AuthoritySidebar';
-import { io } from 'socket.io-client';
+import { initiateSocketConnection, subscribeToEmergency } from '../utils/socketService';
 import { toast } from 'react-toastify';
 import { FaExclamationTriangle, FaTimes } from 'react-icons/fa';
 
@@ -10,9 +10,9 @@ const AuthorityLayout = () => {
     const [emergencyData, setEmergencyData] = useState(null);
 
     useEffect(() => {
-        const socket = io("http://localhost:3000");
+        initiateSocketConnection();
 
-        socket.on("new_emergency_complaint", (data) => {
+        const unsubEmergency = subscribeToEmergency((err, data) => {
             console.log("Emergency Complaint Received:", data);
             setEmergencyData(data);
             setEmergencyModal(true);
@@ -23,7 +23,7 @@ const AuthorityLayout = () => {
         });
 
         return () => {
-            socket.disconnect();
+            if (unsubEmergency) unsubEmergency();
         };
     }, []);
 

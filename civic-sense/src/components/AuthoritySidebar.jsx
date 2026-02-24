@@ -4,8 +4,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import civicLogo from '../assets/civic_sense_symbolic_logo.png';
 import { notify } from '../utils/notify';
-import { io } from 'socket.io-client';
 import { toast } from 'react-toastify';
+import { initiateSocketConnection, subscribeToEmergency, subscribeToAuthorityNotifications } from '../utils/socketService';
 
 const AuthoritySidebar = () => {
     const navigate = useNavigate();
@@ -28,12 +28,10 @@ const AuthoritySidebar = () => {
             setUser(storedUser);
         }
 
-        // Socket.io for Emergency Alerts
-        const socket = io("http://localhost:3000", {
-            withCredentials: true
-        });
+        // Socket.io for Emergency Alerts and Notifications
+        initiateSocketConnection();
 
-        socket.on("new_emergency_complaint", (data) => {
+        const unsubEmergency = subscribeToEmergency((err, data) => {
             console.log("Emergency Alert:", data);
             setNotifications(prev => [data.notification, ...prev]);
             setUnreadCount(prev => prev + 1);
@@ -44,7 +42,7 @@ const AuthoritySidebar = () => {
             });
         });
 
-        socket.on("authority_notification", (data) => {
+        const unsubAuthorityNotif = subscribeToAuthorityNotifications((err, data) => {
             console.log("Authority Notification:", data);
             setNotifications(prev => [{ message: data.message, time: new Date().toISOString() }, ...prev]);
             setUnreadCount(prev => prev + 1);
@@ -56,7 +54,8 @@ const AuthoritySidebar = () => {
         });
 
         return () => {
-            socket.disconnect();
+            if (unsubEmergency) unsubEmergency();
+            if (unsubAuthorityNotif) unsubAuthorityNotif();
         };
     }, []);
 

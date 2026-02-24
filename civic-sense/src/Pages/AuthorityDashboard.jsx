@@ -4,8 +4,7 @@ import { motion } from 'framer-motion';
 import { Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, PieChart, Pie, Cell, Legend } from 'recharts';
 import api from '../api/axios';
 import { notify } from '../utils/notify';
-import { initiateSocketConnection, subscribeToEmergency, disconnectSocket } from '../utils/socketService';
-import { io } from 'socket.io-client';
+import { initiateSocketConnection, subscribeToEmergency, subscribeToAuthorityNotifications } from '../utils/socketService';
 import EmergencyAlertModal from '../components/EmergencyAlertModal';
 import AIAnimation from '../Components/AIAnimation';
 
@@ -57,55 +56,51 @@ const AuthorityDashboard = () => {
         fetchStats();
         fetchNotifications();
 
-        // Socket Connection using consistent service or direct
-        // Note: initiateSocketConnection in utils might use a different singleton.
-        // Let's use direct io here to be sure or reuse the util if it supports custom events easily.
-        // utils/socketService usually exports specific subscribers. 
-        // Let's use a direct local socket for this component to handle 'authority_notification' specifically if not in utils.
-        const socket = io("http://localhost:3000", { withCredentials: true });
+        // Socket Connection using consistent service
+        initiateSocketConnection();
 
-        socket.on("connect", () => {
-            console.log("Authority Dashboard Socket Connected");
+        const unsubAuthority = subscribeToAuthorityNotifications((err, data) => {
+            if (data) {
+                console.log("Dashboard: Authority Notification Received:", data);
+                const newNotif = {
+                    _id: Date.now(),
+                    message: data.message,
+                    type: 'info',
+                    createdAt: new Date().toISOString(),
+                    isRead: false
+                };
+                setNotifications(prev => [newNotif, ...prev]);
+                setUnreadCount(prev => prev + 1);
+            }
         });
 
-        socket.on("authority_notification", (data) => {
-            console.log("Dashboard: Authority Notification Received:", data);
-            const newNotif = {
-                _id: Date.now(),
-                message: data.message,
-                type: 'info',
-                createdAt: new Date().toISOString(),
-                isRead: false
-            };
-            setNotifications(prev => [newNotif, ...prev]);
-            setUnreadCount(prev => prev + 1);
-            // No Toast here, sidebar handles it.
-        });
+        const unsubEmergency = subscribeToEmergency((err, data) => {
+            if (data) {
+                const newNotif = {
+                    _id: Date.now(),
+                    message: `EMERGENCY: ${data.complaint.complaintType}`,
+                    type: 'error',
+                    createdAt: new Date().toISOString(),
+                    isRead: false
+                };
+                setNotifications(prev => [newNotif, ...prev]);
+                setUnreadCount(prev => prev + 1);
 
-        socket.on("new_emergency_complaint", (data) => {
-            const newNotif = {
-                _id: Date.now(),
-                message: `EMERGENCY: ${data.complaint.complaintType}`,
-                type: 'error',
-                createdAt: new Date().toISOString(),
-                isRead: false
-            };
-            setNotifications(prev => [newNotif, ...prev]);
-            setUnreadCount(prev => prev + 1);
-
-            // Trigger the Emergency Modal
-            setCurrentAlert({
-                title: "Emergency Issue Registered! \n" + data.complaint.complaintType,
-                content: `Location: ${data.complaint.complaintLocation}\nDetails: ${data.complaint.complaintDescription}`,
-                image: data.complaint.complaintImage,
-                author: data.complaint.complaintAuthority,
-                createdAt: new Date().toISOString()
-            });
-            setAlertModalOpen(true);
+                // Trigger the Emergency Modal
+                setCurrentAlert({
+                    title: "Emergency Issue Registered! \n" + data.complaint.complaintType,
+                    content: `Location: ${data.complaint.complaintLocation}\nDetails: ${data.complaint.complaintDescription}`,
+                    image: data.complaint.complaintImage,
+                    author: data.complaint.complaintAuthority,
+                    createdAt: new Date().toISOString()
+                });
+                setAlertModalOpen(true);
+            }
         });
 
         return () => {
-            socket.disconnect();
+            if (unsubAuthority) unsubAuthority();
+            if (unsubEmergency) unsubEmergency();
         };
     }, []);
 

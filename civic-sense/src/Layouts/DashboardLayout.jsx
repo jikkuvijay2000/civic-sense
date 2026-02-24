@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
-import { io } from 'socket.io-client';
+import { initiateSocketConnection, subscribeToAlerts } from '../utils/socketService';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaExclamationTriangle, FaTimes } from 'react-icons/fa';
@@ -11,31 +11,28 @@ const DashboardLayout = () => {
     const [alertData, setAlertData] = useState(null);
 
     useEffect(() => {
-        // Connect to the backend Socket.io server
-        const socket = io("http://localhost:3000"); // Ensure this matches your backend URL
+        initiateSocketConnection();
 
-        socket.on("connect", () => {
-            console.log("Connected to Socket.io server");
-        });
-
-        socket.on("new_alert", (data) => {
-            console.log("New Alert Received:", data);
-            setAlertData(data);
-            setAlertModal(true);
-            toast.error(`AGENCY ALERT: ${data.title}`, {
-                position: "top-center",
-                autoClose: false,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-            });
+        const unsubAlerts = subscribeToAlerts((err, data) => {
+            if (data) {
+                console.log("New Alert Received:", data);
+                setAlertData(data);
+                setAlertModal(true);
+                toast.error(`AGENCY ALERT: ${data.title}`, {
+                    position: "top-center",
+                    autoClose: false,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                });
+            }
         });
 
         return () => {
-            socket.disconnect();
+            if (unsubAlerts) unsubAlerts();
         };
     }, []);
 
