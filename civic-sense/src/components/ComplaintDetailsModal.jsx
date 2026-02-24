@@ -142,103 +142,110 @@ const ComplaintDetailsModal = ({ isOpen, onClose, complaint, onUpdate }) => {
                                 <h6 className="fw-bold text-uppercase small text-muted ls-wide mb-4">Resolution Details</h6>
 
                                 {complaint.complaintStatus === 'Resolved' || complaint.complaintStatus === 'Closed' ? (
-                                    <>
-                                        <div className="mb-4">
-                                            <div className="d-flex align-items-center gap-2 text-success mb-2">
-                                                <FaCheckCircle />
-                                                <span className="fw-bold">Marked Resolved</span>
-                                            </div>
-                                            <p className="small text-muted mb-2">
-                                                By Authority on {new Date(complaint.complaintResolvedDate || complaint.updatedAt).toLocaleDateString()}
-                                            </p>
-
-                                            {complaint.complaintNotes && (
-                                                <div className="bg-light p-3 rounded border border-light shadow-sm">
-                                                    <small className="text-uppercase fw-bold text-muted d-block mb-1" style={{ fontSize: '10px', letterSpacing: '0.5px' }}>OFFICIAL AUTHORITY NOTES</small>
-                                                    <p className="mb-0 text-dark" style={{ fontSize: '0.9rem' }}>{complaint.complaintNotes}</p>
-                                                </div>
-                                            )}
+                                    <div className="mb-4">
+                                        <div className="d-flex align-items-center gap-2 text-success mb-2">
+                                            <FaCheckCircle />
+                                            <span className="fw-bold">Marked Resolved</span>
                                         </div>
-
-                                        {/* Download Expense Report */}
-                                        <div className="mb-5">
-                                            <label className="text-uppercase small fw-bold text-muted ls-wide mb-2">Documents</label>
-                                            <button
-                                                onClick={downloadExpenseReport}
-                                                className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2 rounded-pill py-2"
-                                            >
-                                                <FaFilePdf /> Download Expense Report
-                                            </button>
-                                        </div>
-
-                                        {/* Feedback Section */}
-                                        <div className="mt-4">
-                                            <label className="text-uppercase small fw-bold text-muted ls-wide mb-2">Feedback History</label>
-
-                                            {complaint.feedbackHistory && complaint.feedbackHistory.length > 0 ? (
-                                                <div className="d-flex flex-column gap-2 mb-3">
-                                                    {complaint.feedbackHistory.map((fb, idx) => (
-                                                        <div key={idx} className={`p-3 rounded-custom border shadow-sm ${fb.action === 'Accept' ? 'bg-success-subtle' : fb.action === 'Reopen' ? 'bg-warning-subtle' : 'bg-light'}`}>
-                                                            <div className="d-flex justify-content-between align-items-center mb-1">
-                                                                <small className={`fw-bold ${fb.action === 'Accept' ? 'text-success' : fb.action === 'Reopen' ? 'text-warning text-darken' : 'text-dark'}`}>{fb.action} Action</small>
-                                                                <small className="text-muted" style={{ fontSize: '0.7rem' }}>{new Date(fb.date).toLocaleString()}</small>
-                                                            </div>
-                                                            <p className="mb-0 text-dark fst-italic small">"{fb.message}"</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : complaint.feedback && complaint.feedback.message && (
-                                                <div className="bg-light p-3 rounded-custom border shadow-sm mb-3">
-                                                    <small className="text-muted d-block mb-1">Legacy Feedback:</small>
-                                                    <p className="mb-0 text-dark fst-italic small">"{complaint.feedback.message}"</p>
-                                                </div>
-                                            )}
-
-                                            {isOwner && complaint.complaintStatus === 'Resolved' && !complaint.accepted && (
-                                                <div className="p-3 bg-white rounded-custom border shadow-sm">
-                                                    <p className="small text-muted mb-2 fw-medium">Review the resolution. You can accept it or reopen if the issue persists.</p>
-                                                    <textarea
-                                                        className="form-control shadow-none border-secondary-subtle mb-3 text-sm"
-                                                        rows="2"
-                                                        placeholder="Add an optional comment... (Required if reopening)"
-                                                        value={feedbackMsg}
-                                                        onChange={(e) => setFeedbackMsg(e.target.value)}
-                                                    ></textarea>
-                                                    <div className="d-flex gap-2">
-                                                        <button
-                                                            onClick={() => submitFeedback('Accept')}
-                                                            disabled={submitting}
-                                                            className="btn btn-success btn-sm w-50 rounded-pill fw-bold"
-                                                        >
-                                                            {submitting ? 'Processing...' : 'Accept Resolution'}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => submitFeedback('Reopen')}
-                                                            disabled={submitting || !feedbackMsg.trim()}
-                                                            className="btn btn-warning btn-sm w-50 rounded-pill fw-bold text-dark"
-                                                        >
-                                                            {submitting ? '...' : 'Reopen Issue'}
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {complaint.complaintStatus === 'Closed' && (
-                                                <div className="text-center p-3 bg-success-subtle rounded-custom border border-success-subtle mt-2">
-                                                    <FaCheckCircle className="text-success mb-2" size={24} />
-                                                    <h6 className="fw-bold text-success mb-0">Ticket Closed</h6>
-                                                    <small className="text-muted">The citizen has accepted the resolution.</small>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </>
+                                        <p className="small text-muted mb-2">
+                                            By Authority on {new Date(complaint.complaintResolvedDate || complaint.updatedAt).toLocaleDateString()}
+                                        </p>
+                                    </div>
                                 ) : (
-                                    <div className="text-center py-5">
-                                        <FaExclamationCircle size={40} className="text-warning mb-3" />
-                                        <h6 className="fw-bold text-dark">Pending Resolution</h6>
-                                        <p className="text-muted small">Authority is working on this issue. Check back later for reports and feedback options.</p>
+                                    <div className="mb-4">
+                                        <div className="d-flex align-items-center gap-2 text-warning mb-2">
+                                            <FaExclamationCircle />
+                                            <span className="fw-bold">{complaint.complaintStatus === 'Pending' ? 'Pending Resolution' : 'In Progress'}</span>
+                                        </div>
+                                        <p className="small text-muted mb-2">
+                                            Authority is reviewing actively. Check back later for reports.
+                                        </p>
                                     </div>
                                 )}
+
+                                {/* Authority Notes - ALWAYS show if they exist */}
+                                {complaint.complaintNotes && (
+                                    <div className="bg-light p-3 rounded border border-light shadow-sm mb-4">
+                                        <small className="text-uppercase fw-bold text-muted d-block mb-1" style={{ fontSize: '10px', letterSpacing: '0.5px' }}>OFFICIAL AUTHORITY NOTES</small>
+                                        <p className="mb-0 text-dark" style={{ fontSize: '0.9rem', whiteSpace: 'pre-line' }}>{complaint.complaintNotes}</p>
+                                    </div>
+                                )}
+
+                                {/* Documents - Show if expenses were already logged */}
+                                {complaint.expenses && complaint.expenses.length > 0 && (
+                                    <div className="mb-5">
+                                        <label className="text-uppercase small fw-bold text-muted ls-wide mb-2">Documents</label>
+                                        <button
+                                            onClick={downloadExpenseReport}
+                                            className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2 rounded-pill py-2"
+                                        >
+                                            <FaFilePdf /> Download Expense Report
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Feedback Section */}
+                                <div className="mt-4">
+                                    <label className="text-uppercase small fw-bold text-muted ls-wide mb-2">Feedback History</label>
+
+                                    {complaint.feedbackHistory && complaint.feedbackHistory.length > 0 ? (
+                                        <div className="d-flex flex-column gap-2 mb-3">
+                                            {complaint.feedbackHistory.map((fb, idx) => (
+                                                <div key={idx} className={`p-3 rounded-custom border shadow-sm ${fb.action === 'Accept' ? 'bg-success-subtle' : fb.action === 'Reopen' ? 'bg-warning-subtle' : 'bg-light'}`}>
+                                                    <div className="d-flex justify-content-between align-items-center mb-1">
+                                                        <small className={`fw-bold ${fb.action === 'Accept' ? 'text-success' : fb.action === 'Reopen' ? 'text-warning text-darken' : 'text-dark'}`}>{fb.action} Action</small>
+                                                        <small className="text-muted" style={{ fontSize: '0.7rem' }}>{new Date(fb.date).toLocaleString()}</small>
+                                                    </div>
+                                                    <p className="mb-0 text-dark fst-italic small">"{fb.message}"</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : complaint.feedback && complaint.feedback.message ? (
+                                        <div className="bg-light p-3 rounded-custom border shadow-sm mb-3">
+                                            <small className="text-muted d-block mb-1">Legacy Feedback:</small>
+                                            <p className="mb-0 text-dark fst-italic small">"{complaint.feedback.message}"</p>
+                                        </div>
+                                    ) : (
+                                        <p className="text-muted small fst-italic">No feedback history yet.</p>
+                                    )}
+
+                                    {isOwner && complaint.complaintStatus === 'Resolved' && !complaint.accepted && (
+                                        <div className="p-3 bg-white rounded-custom border shadow-sm">
+                                            <p className="small text-muted mb-2 fw-medium">Review the resolution. You can accept it or reopen if the issue persists.</p>
+                                            <textarea
+                                                className="form-control shadow-none border-secondary-subtle mb-3 text-sm"
+                                                rows="2"
+                                                placeholder="Add an optional comment... (Required if reopening)"
+                                                value={feedbackMsg}
+                                                onChange={(e) => setFeedbackMsg(e.target.value)}
+                                            ></textarea>
+                                            <div className="d-flex gap-2">
+                                                <button
+                                                    onClick={() => submitFeedback('Accept')}
+                                                    disabled={submitting}
+                                                    className="btn btn-success btn-sm w-50 rounded-pill fw-bold"
+                                                >
+                                                    {submitting ? 'Processing...' : 'Accept Resolution'}
+                                                </button>
+                                                <button
+                                                    onClick={() => submitFeedback('Reopen')}
+                                                    disabled={submitting || !feedbackMsg.trim()}
+                                                    className="btn btn-warning btn-sm w-50 rounded-pill fw-bold text-dark"
+                                                >
+                                                    {submitting ? '...' : 'Reopen Issue'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {complaint.complaintStatus === 'Closed' && (
+                                        <div className="text-center p-3 bg-success-subtle rounded-custom border border-success-subtle mt-2">
+                                            <FaCheckCircle className="text-success mb-2" size={24} />
+                                            <h6 className="fw-bold text-success mb-0">Ticket Closed</h6>
+                                            <small className="text-muted">The citizen has accepted the resolution.</small>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </motion.div>
