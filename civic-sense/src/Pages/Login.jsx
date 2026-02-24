@@ -9,6 +9,7 @@ import civicLogo from '../assets/civic_sense_symbolic_logo.png';
 import { notify } from '../utils/notify';
 import api from '../api/axios';
 import { BASE_URL } from '../services/baseUrl';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login = () => {
     // Carousel images with captions
@@ -29,6 +30,9 @@ const Login = () => {
     const [unverifiedEmail, setUnverifiedEmail] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
     const [isResending, setIsResending] = useState(false);
+
+    // UI State
+    const [showPassword, setShowPassword] = useState(false);
 
     // Auto-rotate carousel every 4 seconds
     useEffect(() => {
@@ -269,15 +273,25 @@ const Login = () => {
                                             <label htmlFor="passwordInput" className="form-label fw-semibold text-secondary small text-uppercase ls-1 mb-0">Password</label>
                                             <a href="/forgot-password" className="small text-primary text-decoration-none fw-semibold">Forgot Password?</a>
                                         </div>
-                                        <input
-                                            type="password"
-                                            className="form-control input-modern"
-                                            id="passwordInput"
-                                            placeholder="••••••••"
-                                            autoComplete="current-password"
-                                            value={loginDetails.userPassword}
-                                            onChange={(e) => setLoginDetails({ ...loginDetails, userPassword: e.target.value })}
-                                        />
+                                        <div className="position-relative">
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                className="form-control input-modern pe-5"
+                                                id="passwordInput"
+                                                placeholder="••••••••"
+                                                autoComplete="current-password"
+                                                value={loginDetails.userPassword}
+                                                onChange={(e) => setLoginDetails({ ...loginDetails, userPassword: e.target.value })}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn border-0 position-absolute end-0 top-50 translate-middle-y text-muted"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                tabIndex="-1"
+                                            >
+                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <motion.button

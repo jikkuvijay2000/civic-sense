@@ -9,6 +9,7 @@ import civicLogo from '../assets/civic_sense_symbolic_logo.png';
 import { notify } from '../utils/notify';
 import axios from 'axios';
 import { BASE_URL } from '../services/baseUrl';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 // CivicBackground removed as carousel now serves as background
 
 const Register = () => {
@@ -58,6 +59,10 @@ const Register = () => {
 
     const navigate = useNavigate();
     const [touched, setTouched] = useState({});
+
+    // UI state
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleBlur = (field) => {
         setTouched({ ...touched, [field]: true });
@@ -258,34 +263,54 @@ const Register = () => {
                                     <div className="row">
                                         <div className="col-md-6 mb-4">
                                             <label htmlFor="passwordInput" className="form-label fw-semibold text-secondary small text-uppercase ls-1">Password</label>
-                                            <input
-                                                type="password"
-                                                className={`form-control input-modern ${touched.userPassword && !isPasswordValid ? 'is-invalid' : ''}`}
-                                                id="passwordInput"
-                                                placeholder="••••••••"
-                                                autoComplete="new-password"
-                                                onBlur={() => handleBlur('userPassword')}
-                                                onChange={(e) => setUserDetails({ ...userDetails, userPassword: e.target.value })}
-                                            />
+                                            <div className="position-relative">
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    className={`form-control input-modern pe-5 ${touched.userPassword && !isPasswordValid ? 'is-invalid' : ''}`}
+                                                    id="passwordInput"
+                                                    placeholder="••••••••"
+                                                    autoComplete="new-password"
+                                                    onBlur={() => handleBlur('userPassword')}
+                                                    onChange={(e) => setUserDetails({ ...userDetails, userPassword: e.target.value })}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="btn border-0 position-absolute end-0 top-50 translate-middle-y text-muted"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    tabIndex="-1"
+                                                >
+                                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                </button>
+                                            </div>
                                             {touched.userPassword && !isPasswordValid && (
-                                                <div className="invalid-feedback" style={{ fontSize: '0.75rem' }}>
+                                                <div className="invalid-feedback d-block" style={{ fontSize: '0.75rem' }}>
                                                     Must contain: 1 Upper, 1 Lower, 1 Number, 1 Special
                                                 </div>
                                             )}
                                         </div>
                                         <div className="col-md-6 mb-4">
                                             <label htmlFor="confirmPasswordInput" className="form-label fw-semibold text-secondary small text-uppercase ls-1">Confirm</label>
-                                            <input
-                                                type="password"
-                                                className={`form-control input-modern ${touched.userConfirmPassword && !doPasswordsMatch ? 'is-invalid' : ''}`}
-                                                id="confirmPasswordInput"
-                                                placeholder="••••••••"
-                                                autoComplete="new-password"
-                                                onBlur={() => handleBlur('userConfirmPassword')}
-                                                onChange={(e) => setUserDetails({ ...userDetails, userConfirmPassword: e.target.value })}
-                                            />
+                                            <div className="position-relative">
+                                                <input
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    className={`form-control input-modern pe-5 ${touched.userConfirmPassword && !doPasswordsMatch ? 'is-invalid' : ''}`}
+                                                    id="confirmPasswordInput"
+                                                    placeholder="••••••••"
+                                                    autoComplete="new-password"
+                                                    onBlur={() => handleBlur('userConfirmPassword')}
+                                                    onChange={(e) => setUserDetails({ ...userDetails, userConfirmPassword: e.target.value })}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="btn border-0 position-absolute end-0 top-50 translate-middle-y text-muted"
+                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                    tabIndex="-1"
+                                                >
+                                                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                                </button>
+                                            </div>
                                             {touched.userConfirmPassword && !doPasswordsMatch && (
-                                                <div className="invalid-feedback">
+                                                <div className="invalid-feedback d-block">
                                                     Passwords do not match.
                                                 </div>
                                             )}
