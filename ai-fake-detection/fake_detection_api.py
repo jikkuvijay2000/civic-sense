@@ -30,7 +30,7 @@ def detect_fake_image():
         confidence = 0.0
         
         for result in results:
-            if result['label'] in ['artificial', 'fake'] and result['score'] > 0.7:
+            if result['label'] in ['artificial', 'fake'] and result['score'] > 0.9:
                 is_fake = True
                 confidence = result['score']
                 break
@@ -91,7 +91,7 @@ def detect_fake_video():
         confidence = 0.0
         
         for result in results:
-            if result['label'] in ['artificial', 'fake'] and result['score'] > 0.7:
+            if result['label'] in ['artificial', 'fake'] and result['score'] > 0.9:
                 is_fake = True
                 confidence = result['score']
                 break
