@@ -1,0 +1,63 @@
+services:
+  # 1. Frontend
+  - type: web
+    name: civic-sense-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    rootDir: civic-sense
+    envVars:
+      - key: VITE_API_URL
+        value: "https://civic-sense-backend.onrender.com" # Placeholder, update if backend URL is different
+
+  # 2. NodeJS Backend
+  - type: web
+    name: civic-sense-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node index.js
+    rootDir: civic-sense-backend
+    envVars:
+      - key: CLIENT_URL
+        value: "https://civic-sense-frontend.onrender.com"
+      - key: AI_PREDICT_URL
+        value: "https://civic-sense-predict.onrender.com"
+      - key: AI_CAPTION_URL
+        value: "https://civic-sense-caption.onrender.com"
+      - key: AI_VIDEO_URL
+        value: "https://civic-sense-video.onrender.com"
+      - key: AI_FAKE_URL
+        value: "https://civic-sense-fake.onrender.com"
+      # Note: MONGO_URL, CLOUDINARY, EMAIL, GEMINI keys need to be added manually in Render Dashboard
+
+  # 3. AI Prediction Service
+  - type: web
+    name: civic-sense-predict
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn predict_api:app
+    rootDir: ai-complaint-model
+
+  # 4. AI Fake Detection Service
+  - type: web
+    name: civic-sense-fake
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn fake_detection_api:app
+    rootDir: ai-fake-detection
+
+  # 5. AI Image Captioning Service
+  - type: web
+    name: civic-sense-caption
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn image_caption_api:app
+    rootDir: ai-image-detection
+
+  # 6. AI Video Analysis Service
+  - type: web
+    name: civic-sense-video
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn video_analysis_api:app
+    rootDir: ai-video-analysis
