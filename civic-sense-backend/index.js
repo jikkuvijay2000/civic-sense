@@ -13,14 +13,33 @@ const { userRouter } = require("./Router/userRouter");
 const { complaintRouter } = require("./Router/complaintRouter");
 const { noteRouter } = require("./Router/noteRouter");
 const { communityPostRouter } = require("./Router/communityPostRouter");
-const aiChatRouter = require("./Router/aiChatRouter"); // NEW: AI Chat Router
+const aiChatRouter = require("./Router/aiChatRouter");
 
 const app = express();
 const server = http.createServer(app);
 
+// ── Trust Render's reverse proxy (required for rate-limiter & cookies) ──
+app.set('trust proxy', 1);
+
+// ── Parse allowed origins from env (comma-separated list) ──
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+    .split(',')
+    .map(o => o.trim());
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error(`CORS: origin ${origin} not allowed`));
+        }
+    },
+    credentials: true,
+};
+
 const io = new Server(server, {
     cors: {
-        origin: process.env.CLIENT_URL || "http://localhost:5173",
+        origin: allowedOrigins,
         methods: ["GET", "POST"],
         credentials: true
     }
@@ -30,12 +49,10 @@ const io = new Server(server, {
 io.use((socket, next) => {
     let token = null;
 
-    // 1. Try to get token from handshake auth payload (explicit)
     if (socket.handshake.auth && socket.handshake.auth.token) {
         token = socket.handshake.auth.token;
     }
 
-    // 2. Try to get token from cookies (fallback)
     if (!token && socket.handshake.headers.cookie) {
         const cookies = Object.fromEntries(socket.handshake.headers.cookie.split('; ').map(c => c.split('=')));
         token = cookies.accessToken;
@@ -45,7 +62,7 @@ io.use((socket, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-        socket.user = decoded; // Attach user info to socket
+        socket.user = decoded;
         next();
     } catch (err) {
         next(new Error("Authentication error: Invalid token"));
@@ -56,10 +73,7 @@ app.set('io', io);
 
 io.on('connection', (socket) => {
     console.log(`User connected: ${socket.user.userId}`);
-
-    // Join a room specific to this user
     socket.join(socket.user.userId);
-    console.log(`User ${socket.user.userId} joined room ${socket.user.userId}`);
 
     socket.on('disconnect', (reason) => {
         console.log(`User disconnected: ${socket.id}, Reason: ${reason}`);
@@ -69,44 +83,39 @@ io.on('connection', (socket) => {
 app.use(helmet());
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 500, // Limit each IP to 100 requests per `window`
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    windowMs: 15 * 60 * 1000,
+    max: 500,
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 
-// Apply the rate limiting middleware to all requests
 app.use(limiter);
-
 app.use(express.json());
-app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true
-}));
+app.use(cors(corsOptions));
 app.use(cookieParser());
 
 const PORT = process.env.PORT || 3000;
 
 const authLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 100, // Limit each IP to 10 login/register requests per hour
+    windowMs: 60 * 60 * 1000,
+    max: 100,
     message: "Too many login attempts, please try again after an hour"
 });
+
+// ── Health-check (Render pings this to confirm the service is alive) ──
+app.get('/', (req, res) => res.json({ status: 'ok', service: 'Civic Connect API' }));
 
 app.use('/user', authLimiter, userRouter);
 app.use('/complaint', complaintRouter);
 app.use('/note', noteRouter);
 app.use('/community-post', communityPostRouter);
-app.use('/api/chat', aiChatRouter); // NEW: AI Chat endpoint
+app.use('/api/chat', aiChatRouter);
 
 mongoose.connect(process.env.MONGO_URL)
-    .then(() => {
-        console.log("Connected to MongoDB");
-    })
-    .catch((error) => {
-        console.log(error);
-    });
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((error) => console.log(error));
 
 server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}, http://localhost:${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
+
