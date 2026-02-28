@@ -69,7 +69,7 @@ const createComplaint = async (req, res) => {
                 const fakeFormData = new FormData();
                 fakeFormData.append('image', fs.createReadStream(req.files.image[0].path));
 
-                const fakeResponse = await axios.post('http://localhost:5004/detect_fake_image', fakeFormData, {
+                const fakeResponse = await axios.post(`${process.env.AI_FAKE_URL}/detect_fake_image`, fakeFormData, {
                     headers: { ...fakeFormData.getHeaders() }
                 });
 
@@ -119,7 +119,7 @@ const createComplaint = async (req, res) => {
                 const fakeVideoForm = new FormData();
                 fakeVideoForm.append('video', fs.createReadStream(videoPath));
 
-                const fakeVideoResponse = await axios.post('http://localhost:5004/detect_fake_video', fakeVideoForm, {
+                const fakeVideoResponse = await axios.post(`${process.env.AI_FAKE_URL}/detect_fake_video`, fakeVideoForm, {
                     headers: { ...fakeVideoForm.getHeaders() }
                 });
 
@@ -145,7 +145,7 @@ const createComplaint = async (req, res) => {
                 const aiFormData = new FormData();
                 aiFormData.append('video', fs.createReadStream(videoPath));
 
-                const aiResponse = await axios.post('http://localhost:5003/analyze_video', aiFormData, {
+                const aiResponse = await axios.post(`${process.env.AI_VIDEO_URL}/analyze_video`, aiFormData, {
                     headers: {
                         ...aiFormData.getHeaders()
                     }
@@ -292,7 +292,7 @@ const predictComplaint = async (req, res) => {
         }
 
         // Call Python AI Microservice
-        const response = await axios.post('http://localhost:5001/predict', { text });
+        const response = await axios.post(`${process.env.AI_PREDICT_URL}/predict`, { text });
 
         res.json(response.data);
     } catch (error) {
@@ -316,7 +316,7 @@ const generateCaption = async (req, res) => {
             const fakeFormData = new FormData();
             fakeFormData.append('image', fs.createReadStream(req.file.path));
 
-            const fakeResponse = await axios.post('http://localhost:5004/detect_fake_image', fakeFormData, {
+            const fakeResponse = await axios.post(`${process.env.AI_FAKE_URL}/detect_fake_image`, fakeFormData, {
                 headers: { ...fakeFormData.getHeaders() }
             });
 
@@ -332,7 +332,7 @@ const generateCaption = async (req, res) => {
         }
 
         // 2. Call Python Image Captioning Service
-        const response = await axios.post('http://localhost:5002/caption', formData, {
+        const response = await axios.post(`${process.env.AI_CAPTION_URL}/caption`, formData, {
             headers: {
                 ...formData.getHeaders()
             }
@@ -725,7 +725,7 @@ const analyzeVideo = async (req, res) => {
             const fakeVideoForm = new FormData();
             fakeVideoForm.append('video', fs.createReadStream(videoPath));
 
-            const fakeResponse = await axios.post('http://localhost:5004/detect_fake_video', fakeVideoForm, {
+            const fakeResponse = await axios.post(`${process.env.AI_FAKE_URL}/detect_fake_video`, fakeVideoForm, {
                 headers: { ...fakeVideoForm.getHeaders() }
             });
 
@@ -739,7 +739,7 @@ const analyzeVideo = async (req, res) => {
 
         // 2. Analyze Video
 
-        const response = await axios.post('http://localhost:5003/analyze_video', aiFormData, {
+        const response = await axios.post(`${process.env.AI_VIDEO_URL}/analyze_video`, aiFormData, {
             headers: {
                 ...aiFormData.getHeaders()
             }

@@ -3,6 +3,7 @@ from transformers import BlipProcessor, BlipForConditionalGeneration, pipeline
 from PIL import Image
 import torch
 import random
+import os
 
 app = Flask(__name__)
 
@@ -68,4 +69,5 @@ def caption():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(port=5002, debug=True)
+    port = int(os.environ.get("PORT", 5002))
+    app.run(host="0.0.0.0", port=port)

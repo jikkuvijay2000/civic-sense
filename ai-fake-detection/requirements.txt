@@ -3,3 +3,4 @@ transformers
 torch
 pillow
 opencv-python-headless
+gunicorn
